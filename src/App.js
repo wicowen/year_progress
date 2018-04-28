@@ -9,32 +9,6 @@ import Rodal from 'rodal';
 import 'rodal/lib/rodal.css';
 import './App.css';
 
-
-const gradients = [
-  'background:linear-gradient(135deg, #CE9FFC 0%,#7367F0 100%);',
-  'background:linear-gradient(135deg, #b1ea4d 0%,#459522 100%);',
-  'background:linear-gradient(135deg, #c3ec52 0%,#0ba29d 100%);',
-  'background:linear-gradient(135deg, #0FF0B3 0%,#036ED9 100%);',
-  'background:linear-gradient(135deg, #13f1fc 0%,#0470dc 100%);',
-  'background:linear-gradient(135deg, #C56CD6 0%,#3425AF 100%);',
-  'background:linear-gradient(135deg, #F36265 0%,#961276 100%);',
-  'background:linear-gradient(135deg, #F5515F 0%,#A1051D 100%);',
-  'background:linear-gradient(135deg, #f2d50f 0%,#da0641 100%);',
-  'background:linear-gradient(135deg, #fad961 0%,#f76b1c 100%);',
-  'background:linear-gradient(135deg, #5b247a 0%,#1bcedf 100%);',
-  'background:linear-gradient(135deg, #184e68 0%,#57ca85 100%);',
-  'background:linear-gradient(135deg, #65799b 0%,#5e2563 100%);',
-  'background:linear-gradient(135deg, #f02fc2 0%,#6094ea 100%);',
-  'background:linear-gradient(135deg, #7117ea 0%,#ea6060 100%);',
-  'background:linear-gradient(135deg, #622774 0%,#c53364 100%);',
-  'background:linear-gradient(135deg, #17ead9 0%,#6078ea 100%);',
-  'background:linear-gradient(135deg, #f65599 0%,#4d0316 100%);',
-  'background:linear-gradient(135deg, #fcdf8a 0%,#f38381 100%);'
-];
-
-const gradient = gradients[Math.floor(Math.random()*gradients.length)];
-
-
 const CenterDiv = styled.div`
   height: 100%;
   width: 100%;
@@ -43,7 +17,7 @@ const CenterDiv = styled.div`
   align-items: center;
   flex-direction: column;
   position: relative;
-  ${gradient}
+  background:#222222;
 `;
 
 const Header = styled.div`
@@ -108,8 +82,8 @@ class App extends Component {
       perc: 0,
       metric: localStorage.getItem('metric') || 'year',
       visible: false,
-      decimal: localStorage.getItem('decimal') || 10,
-      decimalForm: localStorage.getItem('decimal') || 10,
+      decimal: localStorage.getItem('decimal') || 5,
+      decimalForm: localStorage.getItem('decimal') || 5,
       metricForm: localStorage.getItem('metric') || 'year'
     };
     this.calculatePercent = this.calculatePercent.bind(this);
@@ -119,7 +93,9 @@ class App extends Component {
     this.formDec = this.formDec.bind(this);
     this.formMetric = this.formMetric.bind(this);
     this.saveSettings = this.saveSettings.bind(this);
+    this.doComponentUpdate = this.doComponentUpdate.bind(this);
   }
+
   saveSettings() {
     const decimal = this.state.decimalForm;
     localStorage.setItem('decimal', decimal);
@@ -127,18 +103,23 @@ class App extends Component {
     localStorage.setItem('metric', metric);
     this.setState({ decimal, metric, visible: false });
   }
+
   formMetric(event) {
     this.setState({ metricForm: event.target.value });
   }
+
   formDec(event) {
     this.setState({ decimalForm: event.target.value });
   }
+
   showSettings() {
     this.setState({ visible: true });
   }
+
   closeSettings() {
     this.setState({ visible: false });
   }
+
   changeMetric() {
     const currentMetric = this.state.metric;
     switch (currentMetric) {
@@ -164,6 +145,7 @@ class App extends Component {
         break;
     }
   }
+
   calculatePercent() {
     const start = moment().startOf(this.state.metric);
     const end = moment().endOf(this.state.metric);
@@ -173,23 +155,29 @@ class App extends Component {
     const percent = duration * 100 / total;
     return percent.toFixed(this.state.decimal);
   }
+
   shouldComponentUpdate() {
     return !document.hidden;
   }
-  componentDidMount() {
-    setInterval(() => {
-      const metric = this.state.metric;
-      const displayMetric = metric.charAt(0).toUpperCase() + metric.slice(1).toLowerCase();
-      document.title = `New Tab - ${displayMetric} Progress`;
-      const percent = this.calculatePercent();
-      const oldPerc = this.state.perc;
-      const perc = parseFloat(percent).toFixed(2);
-      if (oldPerc !== perc) {
-        this.setState({ percent, perc });
-      }
-      this.setState({ percent });
-    }, 50);
+
+  doComponentUpdate() {
+    const metric = this.state.metric;
+    const displayMetric = metric.charAt(0).toUpperCase() + metric.slice(1).toLowerCase();
+    document.title = `New Tab - ${displayMetric} Progress`;
+    const percent = this.calculatePercent();
+    const oldPerc = this.state.perc;
+    const perc = parseFloat(percent).toFixed(2);
+    if (oldPerc !== perc) {
+      this.setState({ percent, perc });
+    }
+    this.setState({ percent });
   }
+
+  componentDidMount() {
+    this.doComponentUpdate();
+    setInterval(() => { this.doComponentUpdate() }, 1000);
+  }
+
   render() {
     const metric = this.state.metric;
     const displayMetric = metric.charAt(0).toUpperCase() + metric.slice(1).toLowerCase();
@@ -218,14 +206,6 @@ class App extends Component {
         <SettingsDiv onClick={this.showSettings} style={{cursor: "pointer"}}>
           <FontAwesomeIcon icon={faBars} size="lg" />
         </SettingsDiv>
-        <DateDiv>
-          <div>
-            {moment().format("dddd, MMMM Do YYYY, HH:mm:ss")}
-          </div>
-        </DateDiv>
-        <AuthorDiv>
-          <a href="https://twitter.com/Mubaris_NK" target="_blank" rel="noopener noreferrer">Made with ♥ by Mubaris NK</a>
-        </AuthorDiv>
         <Rodal visible={this.state.visible} onClose={this.closeSettings}>
           <div className="header">Settings</div>
           <div className="body">
