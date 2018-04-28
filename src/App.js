@@ -201,10 +201,10 @@ class App extends Component {
           Some
         </Line>
         <Percent>
-          <h1>{`${this.state.percent} %`}</h1>
+          <h1>{`${this.state.percent}%`}</h1>
         </Percent>
         <SettingsDiv onClick={this.showSettings} style={{cursor: "pointer"}}>
-          <FontAwesomeIcon icon={faBars} size="lg" />
+          <FontAwesomeIcon icon={faBars} size="xs" />
         </SettingsDiv>
         <Rodal visible={this.state.visible} onClose={this.closeSettings}>
           <div className="header">Settings</div>
@@ -269,11 +269,11 @@ injectGlobal`
 
   @keyframes progress-bar {
     0%   {stroke-opacity : 1;}
-    50%  {stroke-opacity: 0.5;}
+    50%  {stroke-opacity : 1;}
     100% {stroke-opacity : 1;}
   }
   .rc-progress-line-path {
-    animation: progress-bar 2.5s linear infinite;
+    animation: progress-bar 10s linear infinite;
   }
 
   .header {
